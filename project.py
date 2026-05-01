@@ -16,20 +16,29 @@ hex_dec = {
     15: "F"
 }
 
+class Colour:
+    def __init__(self, colour):
+        self.colour = colour
+        self.name = get_colour_name(colour)
+        self.type = get_colour_type(colour)
+        self.r, self.g, self.b = get_rgb(colour)
+        self.hex = get_hex(colour)
+
+    def __str__(self):
+        output = ""
+        square = "\u2588\u2588"
+
+        output = f"\nName: {self.name}"
+        output += f"\nType: {self.type.upper()}"
+        output += f"\nRGB: ({self.r}, {self.g}, {self.b})"
+        output += f"\nHEX: #{self.hex}"
+        output += f"\nSample: \033[38;2;{self.r};{self.g};{self.b}m{square}\033[0m"
+
+        return output
+
 def main():
-    colour = input("Colour: ")
-
-    colour_name = get_colour_name(colour)
-    colour_type = get_colour_type(colour)
-    r, g, b = get_rgb(colour)
-    hex_val = get_hex(colour)
-    square = "\u2588\u2588"
-
-    print(f"\nName: {colour_name}")
-    print(f"Type: {colour_type.upper()}")
-    print(f"RGB: ({r}, {g}, {b})")
-    print(f"HEX: #{hex_val}")
-    print(f"Sample: \033[38;2;{r};{g};{b}m{square}\033[0m")
+    colour = Colour(input("Colour: "))
+    print(colour)
 
 # Get colour type (valid options: RGB, HEX)
 def get_colour_type(colour):
@@ -77,9 +86,9 @@ def get_rgb(colour):
         green_hex = colour[2:][:2]
         blue_hex = colour[-2:]
 
-        red = (hex_dec.get(red_hex[0].upper()) * 16) + hex_dec.get(red_hex[1].upper())
-        green = (hex_dec.get(green_hex[0].upper()) * 16) + hex_dec.get(green_hex[1].upper())
-        blue = (hex_dec.get(blue_hex[0].upper()) * 16) + hex_dec.get(blue_hex[1].upper())
+        red = (hex_dec.get(red_hex[0].upper(), int(red_hex[0])) * 16) + hex_dec.get(red_hex[1].upper(), int(red_hex[1]))
+        green = (hex_dec.get(green_hex[0].upper(), int(green_hex[0])) * 16) + hex_dec.get(green_hex[1].upper(), int(green_hex[1]))
+        blue = (hex_dec.get(blue_hex[0].upper(), int(blue_hex[0])) * 16) + hex_dec.get(blue_hex[1].upper(), int(blue_hex[1]))
 
     return red, green, blue
 
@@ -92,15 +101,15 @@ def get_hex(colour):
         blue = int(rgb.group(3))
 
         red_digit1 = red // 16
-        red_digit2 = red - (int(red // 16) * 16)
+        red_digit2 = red % 16
         red_digit = get_hex_dec_convert(red_digit1) + get_hex_dec_convert(red_digit2)
 
         green_digit1 = green // 16
-        green_digit2 = green - (int(green // 16) * 16)
+        green_digit2 = green % 16
         green_digit = get_hex_dec_convert(green_digit1) + get_hex_dec_convert(green_digit2)
 
         blue_digit1 = blue // 16
-        blue_digit2 = blue - (int(blue // 16) * 16)
+        blue_digit2 = blue % 16
         blue_digit = get_hex_dec_convert(blue_digit1) + get_hex_dec_convert(blue_digit2)
 
         return f"{red_digit}{green_digit}{blue_digit}"
