@@ -25,9 +25,7 @@ class Colour:
         self.hex = get_hex(colour)
 
     def __str__(self):
-        output = ""
         square = "\u2588\u2588"
-
         output = f"\nName: {self.name}"
         output += f"\nType: {self.type.upper()}"
         output += f"\nRGB: ({self.r}, {self.g}, {self.b})"
@@ -42,19 +40,19 @@ def main():
 
 # Get colour type (valid options: RGB, HEX)
 def get_colour_type(colour):
+    hex = re.search(r"^#*([0-9a-fA-F]{6})$", colour.strip())
     rgb = re.search(r"(\d{1,3})\D+(\d{1,3})\D+(\d{1,3})", colour)
-    hex = re.search(r"#*([\dabcdefABCDEF]+)", colour)
 
-    if rgb:
-        if 0 <= int(rgb.group(1)) < 256 and 0 <= int(rgb.group(2)) < 256 and 0 <= int(rgb.group(3)) < 256:
-            return "rgb"
-        else:
-            raise ValueError("RGB colour values must be between 0 and 255")
-    elif hex:
+    if hex:
         if len(hex.group(1)) == 6:
             return "hex"
         else:
             raise ValueError("Hexadecimal colours must have six digits")
+    elif rgb:
+        if 0 <= int(rgb.group(1)) < 256 and 0 <= int(rgb.group(2)) < 256 and 0 <= int(rgb.group(3)) < 256:
+            return "rgb"
+        else:
+            raise ValueError("RGB colour values must be between 0 and 255")
 
 # Get colour name from TheColorAPI.com API
 def get_colour_name(colour):
@@ -86,9 +84,9 @@ def get_rgb(colour):
         green_hex = colour[2:][:2]
         blue_hex = colour[-2:]
 
-        red = (hex_dec.get(red_hex[0].upper(), int(red_hex[0])) * 16) + hex_dec.get(red_hex[1].upper(), int(red_hex[1]))
-        green = (hex_dec.get(green_hex[0].upper(), int(green_hex[0])) * 16) + hex_dec.get(green_hex[1].upper(), int(green_hex[1]))
-        blue = (hex_dec.get(blue_hex[0].upper(), int(blue_hex[0])) * 16) + hex_dec.get(blue_hex[1].upper(), int(blue_hex[1]))
+        red = (int(hex_dec.get(red_hex[0].upper(), red_hex[0])) * 16) + int(hex_dec.get(red_hex[1].upper(), red_hex[1]))
+        green = (int(hex_dec.get(green_hex[0].upper(), green_hex[0])) * 16) + int(hex_dec.get(green_hex[1].upper(), green_hex[1]))
+        blue = (int(hex_dec.get(blue_hex[0].upper(), blue_hex[0])) * 16) + int(hex_dec.get(blue_hex[1].upper(), blue_hex[1]))
 
     return red, green, blue
 
@@ -114,7 +112,7 @@ def get_hex(colour):
 
         return f"{red_digit}{green_digit}{blue_digit}"
     elif get_colour_type(colour) == "hex":
-        return colour.upper()
+        return colour.upper().lstrip("#")
 
 # Convert RGB to HEX, and HEX to RGB; when their value is bigger than 9
 def get_hex_dec_convert(digit):
